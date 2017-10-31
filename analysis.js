@@ -20,9 +20,15 @@ function frequency_analysis(text) {
 	}
 	console.log(freq);
 
-	// Compare frequencies to those of common ciphers
-	// First check: is it the same as regular English?
-	
+	/* 
+	   Compare frequencies to those of common ciphers
+	   First check: is it the same as regular English?
+	   Calculate the correlation between english_freqs and freqs
+	*/ 
+	var corr = correlation(freq, english_freqs);
+	if (corr > 0.8) {
+		document.getElementById('results').innerHTML = "Probably transposition"
+	}
 	return freq;
 }
 
@@ -50,4 +56,20 @@ function analysis(form) {
       }
     }
     });
+}
+
+function correlation(freqs_a, freqs_b) {
+	var sumx = 0, sumy = 0, sumxy = 0, sumx2 = 0, sumy2 = 0;
+	for (ch in freqs_a) {
+		var xi = freqs_a[ch]
+		var yi = freqs_b[ch]
+		sumx += xi;
+		sumy += yi;
+		sumxy += xi * yi;
+		sumx2 += Math.pow(xi, 2);
+		sumy2 += Math.pow(yi, 2);
+	}
+	return (26 * sumxy - sumx * sumy) 
+	/ (Math.sqrt(26*sumx2 - Math.pow(sumx, 2)) 
+	* Math.sqrt(26 * sumy2 - Math.pow(sumy, 2)));
 }
