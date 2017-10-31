@@ -25,10 +25,20 @@ function frequency_analysis(text) {
 	   First check: is it the same as regular English?
 	   Calculate the correlation between english_freqs and freqs
 	*/ 
-	var corr = correlation(freq, english_freqs);
-	if (corr > 0.8) {
-		document.getElementById('results').innerHTML = "Probably transposition"
+	var corr = correlation(freq, english_freqs)
+	var results = "";
+	results += "Correlation with regular English: " + Number(corr.toFixed(2)) + "%\n"
+	if (corr >= 0.8) {
+		results += "<br>This could be a transposition cipher"
 	}
+
+	document.getElementById('results').innerHTML = results
+	/*
+		Is it a monoalphabetic substitution cipher?
+		Sort the alphabet by descending frequency, then find the correlation
+	*/
+	var corr2 = correlation()
+
 	return freq;
 }
 
@@ -60,9 +70,10 @@ function analysis(form) {
 
 function correlation(freqs_a, freqs_b) {
 	var sumx = 0, sumy = 0, sumxy = 0, sumx2 = 0, sumy2 = 0;
-	for (ch in freqs_a) {
-		var xi = freqs_a[ch]
-		var yi = freqs_b[ch]
+	// for (ch in freqs_a) {
+	for (var i=0; i<26; i++) {
+		var xi = freqs_a[Object.keys(freqs_a)[i]]
+		var yi = freqs_b[Object.keys(freqs_b)[i]]
 		sumx += xi;
 		sumy += yi;
 		sumxy += xi * yi;
