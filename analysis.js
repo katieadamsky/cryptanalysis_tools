@@ -1,6 +1,9 @@
 
-function frequency_dist(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p
-	, q, r, s, t, u, v, w, x, y, z) {
+/*
+  Constructor for frequency distributions
+*/
+function frequency_dist(a, b, c, d, e, f, g, h, i, j, k, l, m, 
+	n, o, p, q, r, s, t, u, v, w, x, y, z) {
 	this['a'] = a || 0;
 	this['b'] = b || 0;
 	this['c'] = c || 0;
@@ -34,9 +37,10 @@ function frequency_analysis(text) {
 	// Find frequencies of the characters in the ciphertext
 	var freq = new frequency_dist()
 	// English frequency values from Wikipedia
-	var english_freqs = new frequency_dist(8.167,1.492,2.782,4.253,12.702,2.228,2.015,
-	6.094,6.966,0.153,0.772,4.025,2.406,6.749,7.507,1.929,
-	0.095,5.987,6.327,9.056,2.758,0.978,2.360,0.150,1.974,0.074)
+	var english_freqs = new frequency_dist(
+		8.167,1.492,2.782,4.253,12.702,2.228,2.015,6.094,
+		6.966,0.153,0.772,4.025,2.406,6.749,7.507,1.929,
+		0.095,5.987,6.327,9.056,2.758,0.978,2.360,0.150,1.974,0.074)
 	var total = 0;
 	for (var i=0; i<text.length; i++) {
 		freq[text.charAt(i)]++;
@@ -46,7 +50,6 @@ function frequency_analysis(text) {
 		freq[ch] /= parseFloat(total);
 		freq[ch] *= 100;
 	}
-	console.log(freq);
 
 	/* 
 	   Compare frequencies to those of common ciphers
@@ -66,11 +69,16 @@ function frequency_analysis(text) {
 	*/
 	sorted_english = Object.keys(english_freqs).sort(function(a, b){return english_freqs[b]-english_freqs[a]})
 	sorted_cipher = Object.keys(freq).sort(function(a, b){return freq[b]-freq[a]})
+	console.log(sorted_cipher)
 	var monoalphabetic_corr = correlation(freq, english_freqs, sorted_cipher, sorted_english)
 	results += "<br>Correlation between most frequent cipher letters and most frequent "
 	 + "English letters: " + Number(monoalphabetic_corr.toFixed(2))
 	if (monoalphabetic_corr >= 0.8) {
 		results += "<br>This could be a monoalphabetic substitution cipher"
+	}
+	if (text.length % 2 == 0 && freq['j'] == 0) {
+		results += "<br>Cipher contains an even number of letters and no J's"
+		results += "<br>This could be a playfair cipher"
 	}
 
 	document.getElementById('results').innerHTML = results
@@ -105,15 +113,15 @@ function analysis(form) {
 
 function correlation(freqs_a, freqs_b, order_a, order_b) {
 	var sumx = 0, sumy = 0, sumxy = 0, sumx2 = 0, sumy2 = 0;
-		for (var i=0; i<26; i++) {
-			var xi = freqs_a[order_a[i]]
-			var yi = freqs_b[order_b[i]]
-			sumx += xi;
-			sumy += yi;
-			sumxy += xi * yi;
-			sumx2 += Math.pow(xi, 2);
-			sumy2 += Math.pow(yi, 2);
-		}
+	for (var i=0; i<26; i++) {
+		var xi = freqs_a[order_a[i]]
+		var yi = freqs_b[order_b[i]]
+		sumx += xi;
+		sumy += yi;
+		sumxy += xi * yi;
+		sumx2 += Math.pow(xi, 2);
+		sumy2 += Math.pow(yi, 2);
+	}
 	return (26 * sumxy - sumx * sumy) 
 	/ (Math.sqrt(26*sumx2 - Math.pow(sumx, 2)) 
 	* Math.sqrt(26 * sumy2 - Math.pow(sumy, 2)));
