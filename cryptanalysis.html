@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="analysis.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+</head>
+<body>
+	<h1> Cryptanalysis!</h1>
+	<form id="textbox">
+  	Enter your ciphertext <input type="text" name="ciphertext"><br>
+  	<input type="button" value="Submit" onClick="analysis(this.form)">
+	</form>
+
+	<div margin="20px" padding="50px"><canvas id="chart" height="353px" width="707px" ></canvas></div>
+	<p id="results"></p>
+
+</body>
+</html>
