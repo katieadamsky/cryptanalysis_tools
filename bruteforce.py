@@ -10,7 +10,7 @@ from pycipher import Playfair
 import itertools
 import math
 
-MAX_THREADS = 100
+MAX_THREADS = 200
 
 # trash
 def swap(text, ch1, ch2):
@@ -21,6 +21,7 @@ def swap(text, ch1, ch2):
 
 # check if plaintext contains the cribs
 def check(plaintext):
+	plaintext = ''.join(plaintext.split()).lower()
 	if 'congressman' in plaintext or 'foolproof' in plaintext or 'liberation' in plaintext:
 		return True
 	else:
@@ -91,10 +92,10 @@ while upper < len(perm):
 		perm = swap(''.join(perm), perm[upper], perm[lower])
 		pf_text = ColTrans(perm).decipher(ciphertext)
 		if can_decipher(pf_text):
-			print perm
-			t = threading.Thread(target = bruteforce_playfair, args = (pf_text))
+			t = threading.Thread(target = bruteforce_playfair, args = (pf_text,))
 			threads.append(t)
-			if threading.enumerate() < MAX_THREADS:
+			if len(threading.enumerate()) < MAX_THREADS:
+				print perm
 				t.start()
 			else:
 				unran.append(t)
@@ -108,7 +109,7 @@ while upper < len(perm):
 
 if len(unran) > 0:
 	for i in range(len(unran)):
-		while threading.enumerate() < MAX_THREADS:
+		while len(threading.enumerate()) < MAX_THREADS:
 			t = unran[i]
 			t.start()
 
