@@ -4,11 +4,13 @@
 
 '''
 
-import thread
+import threading
 from pycipher import ColTrans
 from pycipher import Playfair
 import itertools
 import math
+
+MAX_THREADS = 100
 
 # trash
 def swap(text, ch1, ch2):
@@ -35,6 +37,27 @@ def can_decipher(pf_text):
 		i += 2
 	return True
 
+def bruteforce_playfair(ciphertext):
+	key = 'abcdefghiklmnopqrstuvwxyz'
+	perm = list(key)
+	weights = [0] * len(key)
+	upper = 1
+	while upper < len(perm):
+		if weights[upper] < upper:
+			lower = 0 if (upper % 2 == 0) else weights[upper]
+			perm = swap(''.join(perm), perm[upper], perm[lower])
+			text = Playfair(perm).decipher(ciphertext)
+			if check(text):
+				print perm
+				print text
+			perm = list(perm)
+			weights[upper] += 1
+			upper = 1
+		else:
+			weights[upper] = 0
+			upper += 1
+	return
+
 
 ciphertext = 'mhstbtyifsaddntphrmlrdktohbobtpaztnfcqmqddsqcdxtermcsmbimmundckladrhcmcsmpbnbivhcmhmftmxtcthmcuepeucphhskrrrcdysgmmglezynfsxylmiaicetnqfwnnunqprcwbccfmtcsprkmctxgrtbqmrkyaxvqzgyanhwnahoqxfgmucnymmogkngnbtsfyddbwhroyanmdaxcizrqnweqqtbffszayoaibirshchsqfhdoqckecpereemakofrcxynlicqonnmiezfqxeecdcerlvsyzdytlcsikrlxccauiecmnvchkedgckhrnuyafuyuklrdzidkyhkeelcoonlxwfdcnddninqhacoxrbxnkkcbqemrknbcymeygzrgmdesizmqxkirairednaafiudmulioiimueezdxccdamhruothtdscmhksvheeehhesidyoklaqqbzstmystbxcieuuuicruaamqxqlqrmzhdsuysuxqmmzmemmqxkqfurmeefiempdnkukrgtofmnwgirmxodaruupxseceehoedrfeprsdiehethxaixtyeuqimneckyelccdmuytfcnnmznngoemcptciobphomckmncmceevzpcamosktzdccaxdhlihppemddqtxrhohkksrxhhkmixuvmicmxdqoeahumqzslcakhstqphippxuppchddtcmqyhnasoxpeumligmkeimpfqoacqplresdxscdfcdlcehhhcmdhbmuoqzapaccttmqrmpzeakcgsagpqsccitsfmmfoqmcfxeiirkdcmglhdmumixmfrpahvuaeuhmgncikhmpcxiplnqmplhcctpcqpxemskcecsdcmcuvqcsiseimtvmklsdcaimyhciqpqedahcycudahmxvxcqqurtgerchwfwdttcrecsebivrfrnqicnkyerqvnymyckpnsxgdepgsbmmrazhclcccqhsyhgcxymkyvrndigytcbgcnecshxfnctkeecpn'
 
@@ -56,9 +79,12 @@ possibilities = 0
 
 word = 'abcdefghij'
 
+
 perm = list(word)
 weights = [0] * len(word)
 upper = 1
+threads = []
+unran = []
 while upper < len(perm):
 	if weights[upper] < upper:
 		lower = 0 if (upper % 2 == 0) else weights[upper]
@@ -66,9 +92,23 @@ while upper < len(perm):
 		pf_text = ColTrans(perm).decipher(ciphertext)
 		if can_decipher(pf_text):
 			print perm
+			t = threading.Thread(target = bruteforce_playfair, args = (pf_text))
+			threads.append(t)
+			if threading.enumerate() < MAX_THREADS:
+				t.start()
+			else:
+				unran.append(t)
+
 		perm = list(perm)
 		weights[upper] += 1
 		upper = 1
 	else:
 		weights[upper] = 0
 		upper += 1
+
+if len(unran) > 0:
+	for i in range(len(unran)):
+		while threading.enumerate() < MAX_THREADS:
+			t = unran[i]
+			t.start()
+
