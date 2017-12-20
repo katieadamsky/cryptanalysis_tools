@@ -1,0 +1,9 @@
+Cool things to add:
+- export the entire key for monoalphabetic, playfair, etc
+
+Playfair
+- digraph analysis specifically for playfair, so it won't count the ones that arent paired together
+- determine if playfair if 
+  a) frequency test doesn't work for trans or mono
+  b) no j's
+  c) even number of letters
